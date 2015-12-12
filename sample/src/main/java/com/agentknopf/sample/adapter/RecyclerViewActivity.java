@@ -7,6 +7,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 
 import com.agentknopf.androidcommons.adapter.RecyclerViewAdapter;
 import com.agentknopf.sample.R;
@@ -23,6 +24,7 @@ import butterknife.OnClick;
  */
 public class RecyclerViewActivity extends AppCompatActivity {
 
+    private static final String TAG = "RecyclerViewActivity";
     private final List<Item> items = new ArrayList<>(20);
 
     @Bind(R.id.toolbar)
@@ -43,6 +45,7 @@ public class RecyclerViewActivity extends AppCompatActivity {
         recyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
         recyclerView.setHasFixedSize(true);
         adapter = new RecyclerViewAdapter(RecyclerViewAdapter.VIEW_TYPE_DEFAULT, new ItemViewHolder.Creator());
+        adapter.registerForOnClick(this);
         adapter.addAll(getItems());
         recyclerView.setAdapter(adapter);
     }
@@ -51,6 +54,7 @@ public class RecyclerViewActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         ButterKnife.unbind(this);
+        adapter.unregisterForOnClick(this);
     }
 
     @OnClick(R.id.fab)
@@ -73,13 +77,26 @@ public class RecyclerViewActivity extends AppCompatActivity {
      */
     public static class Item {
         private final String text;
+        private int position;
 
         public Item() {
             text = "Item";
         }
 
+        public void setPosition(int position) {
+            this.position = position;
+        }
+
+        public int getPosition() {
+            return position;
+        }
+
         public String getText() {
             return text;
         }
+    }
+
+    public void onEventMainThread(Item onClicked){
+        Log.i(TAG, "Clicked on item at position " + onClicked.getPosition());
     }
 }

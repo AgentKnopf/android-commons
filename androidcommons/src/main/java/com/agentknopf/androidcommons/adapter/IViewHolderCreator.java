@@ -9,6 +9,6 @@ import android.view.ViewGroup;
  */
 public interface IViewHolderCreator<K extends ViewHolderBase> {
 
-    public K onCreateViewHolder(ViewGroup parent);
+    K onCreateViewHolder(ViewGroup parent);
 
 }

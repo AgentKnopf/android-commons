@@ -2,10 +2,13 @@ package com.agentknopf.androidcommons.adapter;
 
 import android.support.v7.widget.RecyclerView;
 import android.util.SparseArray;
+import android.view.View;
 import android.view.ViewGroup;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import de.greenrobot.event.EventBus;
 
 /**
  * Created by AgentKnopf on 12.12.2015.
@@ -15,8 +18,14 @@ public class RecyclerViewAdapter<T> extends RecyclerView.Adapter<ViewHolderBase<
     private static final String TAG = "RecyclerViewAdapter";
     public static final int VIEW_TYPE_DEFAULT = 0;
 
-    private List<T> items = new ArrayList<>();
-    private SparseArray<IViewHolderCreator> typeToCreator;
+    /**
+     * Interested parties can subscribe to receive onClickPropagator events which will deliver the position as well as the item itself.
+     * Subscribers must implement a corresponding onEvent method, depending on whether they want to receive results on the UI - or a background thread.
+     */
+    public final EventBus onClickPropagator;
+
+    private final List<T> items = new ArrayList<>();
+    private final SparseArray<IViewHolderCreator> typeToCreator;
 
     public void add(T item) {
         items.add(item);
@@ -39,20 +48,26 @@ public class RecyclerViewAdapter<T> extends RecyclerView.Adapter<ViewHolderBase<
     public RecyclerViewAdapter(int viewType, IViewHolderCreator creator) {
         typeToCreator = new SparseArray<>(1);
         typeToCreator.put(viewType, creator);
+        onClickPropagator = EventBus.builder()
+                .eventInheritance(false)
+                .build();
     }
 
     @Override
     public ViewHolderBase onCreateViewHolder(ViewGroup parent, int viewType) {
-        return typeToCreator.get(viewType).onCreateViewHolder(parent);
+        ViewHolderBase holder = typeToCreator.get(viewType).onCreateViewHolder(parent);
+        return holder;
     }
 
     @Override
-    public void onBindViewHolder(ViewHolderBase holder, int position) {
+    public void onBindViewHolder(ViewHolderBase holder, final int position) {
         holder.bind(position, items.get(position));
-    }
-
-    public T getItemAt(int position) {
-        return items.get(position);
+        holder.getRowView().setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onClickPropagator.post(items.get(position));
+            }
+        });
     }
 
     @Override
@@ -60,4 +75,22 @@ public class RecyclerViewAdapter<T> extends RecyclerView.Adapter<ViewHolderBase<
         return items.size();
     }
 
+    /**
+     * Register for on-click events. Make sure to provide an onEvent method implementation, receiving an instance of T
+     * to handle the actual clicks. Also: Make sure to unsubscribe, in case you are no longer interested in receiving on-click updates.
+     *
+     * @param subscriber
+     */
+    public void registerForOnClick(Object subscriber) {
+        onClickPropagator.register(subscriber);
+    }
+
+    /**
+     * Unsubscribes from on-click events.
+     *
+     * @param subscriber
+     */
+    public void unregisterForOnClick(Object subscriber) {
+        onClickPropagator.unregister(subscriber);
+    }
 }

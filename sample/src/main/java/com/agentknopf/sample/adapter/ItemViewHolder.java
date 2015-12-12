@@ -34,6 +34,7 @@ public class ItemViewHolder extends ViewHolderBase<RecyclerViewActivity.Item> {
 
     @Override
     public void bind(int position, RecyclerViewActivity.Item item) {
+        item.setPosition(position);
         textView.setText(String.format("%s %s", item.getText(), position));
     }
 
