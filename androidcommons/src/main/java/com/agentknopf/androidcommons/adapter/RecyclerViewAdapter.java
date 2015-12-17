@@ -31,12 +31,17 @@ public class RecyclerViewAdapter<T> extends RecyclerView.Adapter<ViewHolderBase<
         items.add(item);
     }
 
-    public void clearItems() {
+    public void clear() {
         items.clear();
     }
 
     public void addAll(List<T> items) {
         this.items.addAll(items);
+    }
+
+    public void replaceAll(List<T> items) {
+        clear();
+        addAll(items);
     }
 
     /**
@@ -93,4 +98,5 @@ public class RecyclerViewAdapter<T> extends RecyclerView.Adapter<ViewHolderBase<
     public void unregisterForOnClick(Object subscriber) {
         onClickPropagator.unregister(subscriber);
     }
+
 }

@@ -7,6 +7,7 @@ import android.view.View;
  * Created by AgentKnopf on 12.12.2015.
  */
 public abstract class ViewHolderBase<T> extends RecyclerView.ViewHolder {
+
     /**
      * Create your Viewholder and inflate the required layout.
      *
@@ -19,7 +20,9 @@ public abstract class ViewHolderBase<T> extends RecyclerView.ViewHolder {
     public abstract void bind(int position, T item);
 
     /**
+     * This is commonly used for creating onClickHandler.
      * @return root view for a row.
      */
     public abstract View getRowView();
+
 }
