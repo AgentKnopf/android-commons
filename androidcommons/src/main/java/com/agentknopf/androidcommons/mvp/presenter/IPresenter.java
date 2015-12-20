@@ -1,5 +1,7 @@
 package com.agentknopf.androidcommons.mvp.presenter;
 
+import android.os.Bundle;
+
 /**
  * A presenter used by a view.
  *
@@ -19,8 +21,9 @@ public interface IPresenter {
 
     /**
      * Should be called by the fragment when it gets created.
+     * @param savedInstance or the argument bundle initially passed to the fragment.
      */
-    void onCreate();
+    void onCreate(Bundle savedInstance);
 
     /**
      * Should be called by the fragment when it gets destroyed. Make sure to release all resources at this point.
